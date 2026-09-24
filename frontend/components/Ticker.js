@@ -1,0 +1,4 @@
+import { istTime } from "../lib/api";
+import Icon from "./Icon";
+const ICON = { weather: "cloud", air: "air", transit: "bus", complaint: "message", power: "power", traffic: "traffic" };
+export default function Ticker({ items=[] }){return <div className="ticker"><div className="ticker-head"><div><div className="eyebrow">EVENT STREAM</div><h3>Latest civic events</h3></div><span>LIVE</span></div><div className="ticker-list">{items.map((e,i)=><div className="ticker-item" key={i}><time>{istTime(e.ts)}</time><span className="ticker-icon"><Icon name={ICON[e.category]||'activity'} size={13}/></span><div><b>{e.subtype.replace(/_/g,' ')}</b><small>{e.zone}{e.category==='traffic'?` · ${Math.round(e.value*100)}% congestion`:e.value!=null&&e.unit!=='report'?` · ${e.value} ${e.unit||''}`:''}</small></div></div>)}{!items.length&&<div className="empty-state">Waiting for event data…</div>}</div></div>}

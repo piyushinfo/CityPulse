@@ -1,0 +1,29 @@
+{
+  "name": "citypulse-frontend",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "format": "prettier --write \"pages/**/*.js\" \"components/**/*.js\" \"lib/**/*.js\""
+  },
+  "dependencies": {
+    "@deck.gl/core": "~9.0.0",
+    "@deck.gl/geo-layers": "~9.0.0",
+    "@deck.gl/layers": "~9.0.0",
+    "@deck.gl/react": "~9.0.0",
+    "leaflet": "1.9.4",
+    "next": "^14.2.25",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-leaflet": "4.2.1",
+    "@deck.gl/extensions": "~9.0.0",
+    "@deck.gl/mesh-layers": "~9.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "prettier": "^3.3.3"
+  }
+}
