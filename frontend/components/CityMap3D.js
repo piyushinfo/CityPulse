@@ -24,8 +24,8 @@ export default function CityMap3D({ zones, zoneStates, selected, onSelect, cente
   const layers = [
     new TileLayer({
       id: "basemap",
-      data: isLight ? "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png" : "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-      minZoom: 0, maxZoom: 19, tileSize: 256,
+      data: isLight ? "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}" : "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+      minZoom: 0, maxZoom: 16, tileSize: 256,
       renderSubLayers: (props) => {
         const [[west, south], [east, north]] = props.tile.boundingBox;
         return new BitmapLayer(props, { data: null, image: props.data, bounds: [west, south, east, north] });

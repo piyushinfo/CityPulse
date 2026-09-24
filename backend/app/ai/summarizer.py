@@ -68,20 +68,59 @@ SYSTEM = ("You write a 2-sentence status update for residents of a city. Use ONL
           "no emoji, under 60 words.")
 
 
+GROQ_URL = "https://api.groq.com/openai/v1"
+_model_in_use = {"id": None}   # remembers a working model after a fallback
+
+
+async def _pick_available_model(client):
+    """Ask Groq which models this key can use and pick a sensible chat model."""
+    r = await client.get(f"{GROQ_URL}/models", headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"})
+    r.raise_for_status()
+    ids = [m["id"] for m in r.json().get("data", []) if m.get("active", True)]
+    skip = ("whisper", "tts", "guard", "embed", "vision", "playai")
+    chat = [i for i in ids if not any(k in i.lower() for k in skip)]
+    for pref in ("llama-3.3-70b", "llama", "gpt-oss", "qwen", "gemma", "mixtral"):
+        for i in chat:
+            if pref in i.lower():
+                return i
+    return chat[0] if chat else None
+
+
+async def groq_chat(messages, max_tokens, temperature, timeout=15):
+    """POST a chat completion. If the configured model is unknown/retired (404/400 'model'),
+    switch automatically to a model the key can use. Errors carry Groq's own message."""
+    import httpx
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        model = _model_in_use["id"] or config.GROQ_MODEL
+        for attempt in range(2):
+            r = await client.post(f"{GROQ_URL}/chat/completions",
+                                  headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
+                                  json={"model": model, "temperature": temperature, "max_tokens": max_tokens,
+                                        "messages": messages})
+            if r.status_code == 200:
+                _model_in_use["id"] = model
+                return r.json()["choices"][0]["message"]["content"].strip()
+            try:
+                detail = r.json().get("error", {}).get("message", r.text[:200])
+            except ValueError:
+                detail = r.text[:200]
+            model_problem = r.status_code in (400, 404) and "model" in detail.lower()
+            if attempt == 0 and model_problem:
+                fallback = await _pick_available_model(client)
+                if fallback and fallback != model:
+                    print(f"[groq] model '{model}' unavailable ({detail}); switching to '{fallback}'")
+                    model = fallback
+                    continue
+            raise RuntimeError(f"Groq {r.status_code}: {detail}")
+
+
 async def llm_summary(facts):
     if not config.GROQ_API_KEY:
         return None, "no GROQ_API_KEY"
     try:
-        import httpx
-        async with httpx.AsyncClient(timeout=12) as client:
-            r = await client.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
-                json={"model": config.GROQ_MODEL, "temperature": 0.2, "max_tokens": 150,
-                      "messages": [{"role": "system", "content": SYSTEM},
-                                   {"role": "user", "content": json.dumps(facts)}]})
-            r.raise_for_status()
-            text = r.json()["choices"][0]["message"]["content"].strip()
+        text = await groq_chat([{"role": "system", "content": SYSTEM},
+                                {"role": "user", "content": json.dumps(facts)}], max_tokens=150, temperature=0.2,
+                               timeout=12)
     except Exception as e:
         return None, f"llm error: {e}"
     ok, why = validate(text, facts)
@@ -127,16 +166,8 @@ async def copilot_answer(question, facts, state):
         "links": state.get("links"), "feeds": state.get("feeds")
     }}
     try:
-        import httpx
-        async with httpx.AsyncClient(timeout=15) as client:
-            r = await client.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
-                json={"model": config.GROQ_MODEL, "temperature": 0.15, "max_tokens": 220,
-                      "messages": [{"role": "system", "content": COPILOT_SYSTEM},
-                                   {"role": "user", "content": json.dumps(payload)}]})
-            r.raise_for_status()
-            text = r.json()["choices"][0]["message"]["content"].strip()
+        text = await groq_chat([{"role": "system", "content": COPILOT_SYSTEM},
+                                {"role": "user", "content": json.dumps(payload)}], max_tokens=220, temperature=0.15)
         # validate against the SAME payload the model saw (facts + state), not facts alone;
         # 90 words is roughly 600 characters, so allow up to 700
         # (the question itself is excluded, so a number typed by the user can't "validate" itself)

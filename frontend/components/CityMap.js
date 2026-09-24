@@ -12,8 +12,9 @@ export default function CityMap({ zones, zoneStates, selected, onSelect, center 
   return (
     <MapContainer center={center} zoom={11} scrollWheelZoom={false} style={{ height: "100%", minHeight: 380 }}>
       <TileLayer
-        attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-        url={tiles ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"}
+        attribution="Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors"
+        maxZoom={16}
+        url={tiles ? "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}" : "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"}
       />
       {zones.map((z) => {
         const st = byId[z.id] || { status: "calm", score: 100, bpm: 60 };

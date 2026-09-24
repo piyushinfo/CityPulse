@@ -324,6 +324,8 @@ class Engine:
             if self.world.weather_override is None and "weather" not in self.world.killed:
                 raw = await fetch_weather_raw()
                 self.feeds["weather"]["source"] = "open-meteo" if raw else "synthetic-fallback"
+                if not raw:
+                    next_fetch = now + timedelta(minutes=2)   # e.g. 429 on shared cloud IPs: retry sooner
                 raw = raw or fallback_weather_raw(self.world)
                 cur = raw["current"]
                 self.world.rain_mm = float(cur.get("precipitation") or 0)
