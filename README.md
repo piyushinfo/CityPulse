@@ -13,7 +13,7 @@
 [![Deployed on Vercel](https://img.shields.io/badge/Frontend-Vercel-000?logo=vercel)](https://vercel.com/)
 [![Backend on Render](https://img.shields.io/badge/Backend-Render-46E3B7?logo=render&logoColor=black)](https://render.com/)
 
-[**Live Demo**](https://YOUR-APP.vercel.app) · [**API Docs**](https://citypulse-api-j95x.onrender.com/docs) · [**Demo Video**](#) · [**Report a Bug**](https://github.com/piyushinfo/CityPulse/issues)
+[**Live Demo**](https://city-pulse-theta.vercel.app) · [**API Docs**](https://citypulse-api-j95x.onrender.com/docs) · [**Demo Video**](#) · [**Report a Bug**](https://github.com/piyushinfo/CityPulse/issues)
 
 *Built for **AmiHacks — Track B: CityPulse, The Live Civic Health Dashboard***
 
@@ -212,7 +212,7 @@ The analysis core is **pure**: the state is a function of `(events, time)`. That
 | Air quality (stations) | CPCB via [data.gov.in](https://data.gov.in/) | **Real** | 15 min |
 | Air quality (city baseline) | Open-Meteo Air Quality | **Real** | 30 min |
 | Air quality (per-zone sensors) | Simulator, seeded by the real city PM2.5 | Simulated | 60 s |
-| Road congestion | [TomTom Traffic Flow](https://developer.tomtom.com/) | Real with key, else simulated | 5–10 min |
+| Road congestion | [TomTom Traffic Flow](https://developer.tomtom.com/) | **Real** with key, else simulated | 5–10 min |
 | Bus delays | Simulator (JB-1/2/3 routes) | Simulated | live |
 | Citizen complaints | Simulator + **real resident reports** | Mixed | live |
 | Power feeders | Simulator | Simulated | live |
@@ -320,7 +320,7 @@ Open **http://localhost:3000** 🎉
 | `TELEGRAM_CHAT_ID` | Optional | Officer / control-room chat |
 | `TELEGRAM_ZONE_CHATS` | Optional | Per-zone resident groups, e.g. `z1:-1001234567890,z3:-1009876543210` |
 | `CITY_NAME`, `CITY_LAT`, `CITY_LON` | Optional | Defaults: `Jaipur`, `26.88`, `75.80` |
-| `CORS_ORIGINS` | For deploy | Your frontend URL, e.g. `https://your-app.vercel.app` |
+| `CORS_ORIGINS` | For deploy | Your frontend URL, e.g. `https://city-pulse-theta.vercel.app` |
 | `HISTORY_DAYS`, `TICK_SECONDS`, `WINDOW_MIN`, `LINK_WINDOW_MIN` | Optional | Tuning: `3`, `5`, `30`, `45` |
 | `USE_REAL_APIS` | Optional | `false` forces fully offline simulation |
 
@@ -336,7 +336,7 @@ Open **http://localhost:3000** 🎉
 
 ## 📡 API Reference
 
-Interactive docs are available at **`/docs`** (Swagger UI).
+Interactive docs are available at **[`/docs`](https://citypulse-api-j95x.onrender.com/docs)** (Swagger UI).
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
@@ -365,6 +365,7 @@ Interactive docs are available at **`/docs`** (Swagger UI).
 ```
 CityPulse/
 ├── render.yaml                 # Render blueprint (backend, free plan)
+├── LICENSE                     # MIT
 ├── backend/
 │   ├── requirements.txt
 │   ├── .env.example
@@ -418,15 +419,15 @@ Expected last line: `ALL CHECKS PASSED`.
 
 ## ☁️ Deployment
 
-**Backend on Render:** New → Web Service → this repo, then:
+**Backend on Render:** [citypulse-api-j95x.onrender.com](https://citypulse-api-j95x.onrender.com) — New → Web Service → this repo, then:
 - Root Directory `backend`, Instance Type **Free**
 - Build `pip install -r requirements.txt`
 - Start `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- Env: `PYTHON_VERSION=3.11.9`, your keys, and `CORS_ORIGINS=<your Vercel URL>`
+- Env: `PYTHON_VERSION=3.11.9`, your keys, and `CORS_ORIGINS=https://city-pulse-theta.vercel.app`
 
-**Frontend on Vercel:** Import → this repo, then:
+**Frontend on Vercel:** [city-pulse-theta.vercel.app](https://city-pulse-theta.vercel.app) — Import → this repo, then:
 - Root Directory `frontend`
-- Env: `NEXT_PUBLIC_API_URL=<your Render URL>`
+- Env: `NEXT_PUBLIC_API_URL=https://citypulse-api-j95x.onrender.com`
 - `frontend/.npmrc` contains `legacy-peer-deps=true` for deck.gl
 
 > 💡 Render's free tier sleeps after 15 min idle. A free [UptimeRobot](https://uptimerobot.com/) monitor on `/api/health` every 5 minutes keeps it awake.
@@ -460,10 +461,10 @@ Expected last line: `ALL CHECKS PASSED`.
 
 | Name | Role |
 | --- | --- |
-| **Piyush Sharma** ([@piyushinfo](https://github.com/piyushinfo)) | Lead · Full-stack |
-| *Teammate* | Data & simulators |
-| *Teammate* | Analysis & backend |
-| *Teammate* | Frontend & design |
+| **Piyush Sharma** ([@piyushinfo](https://github.com/piyushinfo)) | Frontend & Workflow |
+| **Piyush Khandelwal** | Data & Simulators |
+| **Mudra Vyas** | Backend & Presentation |
+| **Pooja Kumari** | Analysis & Design |
 
 ---
 
