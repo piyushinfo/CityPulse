@@ -127,7 +127,9 @@ def detect(events, now, baseline, window_min=None):
         if e.category == "air" and now - timedelta(minutes=60) <= e.ts_utc <= now:
             air[e.zone_id].append(e)
     for zid, rs in air.items():
-        if rs[-1].ts_utc >= now - timedelta(minutes=10) and rs[-1].value > PM_LIMIT:
+                # real CPCB stations update roughly once an hour, so a 10-minute freshness
+        # window was silently discarding real "poor" readings before they ever counted
+        if rs[-1].ts_utc >= now - timedelta(minutes=75) and rs[-1].value > PM_LIMIT:
             st = _consecutive_start(rs, lambda e: e.value > PM_LIMIT)
             out.append(Anomaly(id=f"{zid}:air:pm25", zone_id=zid, category="air", kind="threshold",
                                label=label_for("air:pm25"), severity=round(rs[-1].severity, 2), start=st,
@@ -139,7 +141,8 @@ def detect(events, now, baseline, window_min=None):
         if e.category == "traffic" and now - timedelta(minutes=60) <= e.ts_utc <= now:
             traffic[e.zone_id].append(e)
     for zid, rs in traffic.items():
-        if rs[-1].ts_utc >= now - timedelta(minutes=15) and rs[-1].value >= CONGESTION_LIMIT:
+                # real TomTom traffic updates every ~10 min; give it slack for a slow or skipped cycle
+        if rs[-1].ts_utc >= now - timedelta(minutes=40) and rs[-1].value >= CONGESTION_LIMIT:
             st = _consecutive_start(rs, lambda e: e.value >= CONGESTION_LIMIT)
             out.append(Anomaly(id=f"{zid}:traffic:congestion", zone_id=zid, category="traffic", kind="threshold",
                                label=label_for("traffic:congestion"), severity=round(rs[-1].severity, 2), start=st,
