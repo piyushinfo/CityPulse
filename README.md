@@ -65,8 +65,6 @@ CityPulse treats the city like a patient in intensive care:
 | Prognosis | Next-hour outlook per zone |
 | Care team | Incidents routed to the owning department |
 
-> *"MedFlow monitored a patient's vitals. CityPulse monitors a neighbourhood's."*
-
 ---
 
 ## ✨ Key Features
@@ -475,8 +473,6 @@ Expected last line: `ALL CHECKS PASSED`.
 - [Esri](https://www.esri.com/), [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, [Leaflet](https://leafletjs.com/) and [deck.gl](https://deck.gl/) for maps
 - [Groq](https://groq.com/) for fast LLM inference
 - AmiHacks organizers and mentors
-
-> **Note on prior work:** setup patterns (FastAPI layout, Next.js configuration, deployment files) were adapted from our earlier project [MedFlow-AI](https://github.com/piyushinfo/MedFlow-AI). All CityPulse logic was written during the hackathon.
 
 ---
 
